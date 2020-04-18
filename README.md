@@ -8,6 +8,7 @@ Version 0.0.1
 * Click 7.0
 * Requests 2.22.0
 * Pandas 0.25.3
+* colorama 0.4.3
 
 
 ----------Usage----------

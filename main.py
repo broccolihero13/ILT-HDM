@@ -7,6 +7,7 @@ import json
 import dateutil.parser
 import csv
 from datetime import datetime, timedelta
+import colorama
 #note: this app is used for Live Training historical data migrations in Bridge
 #it must use a CSV with the following fields (LT courses must already exist in Bridge):
 # uid,live_course_id,completed_at  
@@ -23,20 +24,23 @@ headers = {}
 @click.option("--token","-t", prompt=True, required=True, help="The API token for accessing the domain")
 @click.option("--file","-f", prompt=True, required=True)
 def main(domain, token, file):
-    click.echo(f"Let's get started by adding historical ILT enrollments to https://{domain}.bridgeapp.com")
+    click.secho(f"Let's get started by adding historical ILT enrollments to https://{domain}.bridgeapp.com", fg="green")
     global base_url, headers 
     base_url = f"https://{domain}.bridgeapp.com/api/"
     headers = {'Authorization':token,'Content-Type':'application/json'}
     # Make sure we have what we need to proceed (domain is valid, file exists, timezone is set for )
     account_settings = requests.get(f"{base_url}config/sub_account", headers=headers)
     if account_settings.status_code != 200:
-        raise EnvironmentError(f'ERROR: Status Code == {account_settings.status_code} This Bridge account could not be found! Check that the domain is valid!')
+        raise EnvironmentError(click.style(f'ERROR: Status Code == {account_settings.status_code} This Bridge account could not be found! Check that the domain is valid!', fg="red"))
 
     if not os.path.isfile(file):
-        raise ValueError('the file does not exist or the path is incorrect')
+        raise ValueError(click.style('the file does not exist or the path is incorrect', fg="red"))
     
-    timezone = account_settings.json()["sub_accounts"][0]["config"]["time_zone"]
-    click.echo(timezone)
+    try:
+        timezone = account_settings.json()["sub_accounts"][0]["config"]["time_zone"]
+    except:
+        raise ValueError(click.style(f'Could not retrieve the timezone for your specific Bridge account, check that the URL is a valid one.',fg="red"))
+    click.secho(timezone, fg="blue")
     all_possible_sessions = []
 
     # read, create/check unique value, and sort the CSV file
@@ -54,9 +58,9 @@ def main(domain, token, file):
     for i in uniq_sessions:
         # create and publish sessions and make a dictionary with the unique values as the keys
         if create_session(i, timezone):
-            click.echo(f"Session created for {i[0]}-{i[1]}")
+            click.secho(f"Session created for {i[0]}-{i[1]}", fg="yellow")
             if publish_session(i):
-                click.echo(f"Session published for {i[0]}-{i[1]}")
+                click.secho(f"Session published for {i[0]}-{i[1]}", fg="yellow")
         
     # register the users in the session
     for index, row in df.iterrows():
@@ -68,7 +72,7 @@ def main(domain, token, file):
 
 
 def create_session(tup, timezone):
-    click.echo(base_url)
+    # click.echo(base_url) #for troubleshooting purposes
     d = dateutil.parser.parse(f"{tup[1]}T12:00:00")
     d_plus_60 = d + timedelta(hours=1)
     new_end = d_plus_60.isoformat()
@@ -112,7 +116,7 @@ def register_user(from_row):
         if get_user.status_code == 200 and created_sessions[id_string]["published"]:
             get_user_id = get_user.json()["users"][0]["id"]
             id_for_session_reg = created_sessions[id_string]["session_id"]
-            print(f"Session ID:{id_for_session_reg} - Uniq:{from_row['uniq_course']} - User: {from_row['uid']}")
+            click.secho(f"Session ID:{id_for_session_reg} - Uniq:{from_row['uniq_course']} - User: {from_row['uid']}", fg="yellow")
             payload = {"user_id": get_user_id}
             try:
                 user_register = requests.post(f"{base_url}author/live_course_sessions/{id_for_session_reg}/registrations", headers=headers, data=json.dumps(payload))
