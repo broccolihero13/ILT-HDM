@@ -3,12 +3,19 @@ This is a CLI tool used to create Historical Data for Live Training enrollments 
 
 Version 0.0.1 
 
+----------Unix/Linux Install----------
+Open a terminal and navigate to the directory "Click-ILT-HDM"
+1. Install the dependecies by running `pip install -r requirements.txt`
+2. Run `pip install -e .`, this will read the setup file and install the new command "ILTHDM" in your terminal.
+
+Now you'll be able to go to any directory with an ILT HDM CSV file and run `ILTHDM`. Then just follow the prompts.
+
+
 ----------Technologies Used----------
 * Python 3.8.0
 * Click 7.0
 * Requests 2.22.0
 * Pandas 0.25.3
-* colorama 0.4.3
 
 
 ----------Usage----------
@@ -17,5 +24,8 @@ Bridge doesn't currently support a historical data migration for their Interacti
 * note 1: Expects ISO 8601 date format (YYYY-MM-DD) and will grab the timezone from your Bridge database.
 * note 2: this does not look for current dates in Bridge so it will create a brand new session for each of these dates and would create duplicates if you run this consecutively with the same file.
 
+----------Potential Issues----------
+* Be sure to check your CSV file before attempting the upload, there are only limited checks for the file.
+* For more information use `ILTHDM --help`
 
 Author: broccolihero13
