@@ -4,7 +4,7 @@ This is a CLI tool used to create Historical Data for Live Training enrollments 
 Version 0.0.1 
 
 ----------Unix/Linux Install----------
-Open a terminal and navigate to the directory "Click-ILT-HDM"
+Open a terminal and navigate to the directory that has the "main.py" and "sample.py" scripts from this repository. By default, it downloads as "ILT-HDM-master".
 1. Install the dependecies by running `pip install -r requirements.txt`
 2. Run `pip install -e .`, this will read the setup file and install the new command "ILTHDM" in your terminal.
 
