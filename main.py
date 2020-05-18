@@ -28,6 +28,7 @@ def main(domain, token, file):
     global base_url, headers 
     base_url = f"https://{domain}.bridgeapp.com/api/"
     headers = {'Authorization':token,'Content-Type':'application/json'}
+    
     # Make sure we have what we need to proceed (domain is valid, file exists, timezone is set for )
     account_settings = requests.get(f"{base_url}config/sub_account", headers=headers)
     if account_settings.status_code != 200:
